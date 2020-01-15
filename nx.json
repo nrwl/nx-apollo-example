@@ -1,7 +1,7 @@
 {
   "npmScope": "nx-apollo-example",
   "implicitDependencies": {
-    "angular.json": "*",
+    "workspace.json": "*",
     "package.json": {
       "dependencies": "*",
       "devDependencies": "*"
@@ -23,6 +23,13 @@
     },
     "api-interfaces": {
       "tags": []
+    },
+    "nx-apollo-react": {
+      "tags": []
+    },
+    "nx-apollo-react-e2e": {
+      "tags": [],
+      "implicitDependencies": ["nx-apollo-react"]
     }
   }
 }

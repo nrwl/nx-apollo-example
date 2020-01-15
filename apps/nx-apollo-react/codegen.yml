@@ -1,0 +1,11 @@
+overwrite: true
+schema: "apps/api/src/app/schema.graphql"
+generates:
+  apps/nx-apollo-react/src/app/generated/generated.tsx:
+    documents: "apps/nx-apollo-react/**/*.graphql"
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHooks: true

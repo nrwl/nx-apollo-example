@@ -7,7 +7,7 @@ h1 {
   display: flex;
 }
 
-nx-apollo-example-set-list {
+SetList {
   flex: 1;
   padding: 8px;
 }
