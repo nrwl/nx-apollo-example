@@ -1,35 +1,35 @@
 {
   "version": 1,
   "projects": {
-    "nx-apollo": {
+    "nx-apollo-angular": {
       "projectType": "application",
       "schematics": {},
-      "root": "apps/nx-apollo",
-      "sourceRoot": "apps/nx-apollo/src",
+      "root": "apps/nx-apollo-angular",
+      "sourceRoot": "apps/nx-apollo-angular/src",
       "prefix": "nx-apollo-example",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/apps/nx-apollo",
-            "index": "apps/nx-apollo/src/index.html",
-            "main": "apps/nx-apollo/src/main.ts",
-            "polyfills": "apps/nx-apollo/src/polyfills.ts",
-            "tsConfig": "apps/nx-apollo/tsconfig.app.json",
+            "outputPath": "dist/apps/nx-apollo-angular",
+            "index": "apps/nx-apollo-angular/src/index.html",
+            "main": "apps/nx-apollo-angular/src/main.ts",
+            "polyfills": "apps/nx-apollo-angular/src/polyfills.ts",
+            "tsConfig": "apps/nx-apollo-angular/tsconfig.app.json",
             "aot": false,
             "assets": [
-              "apps/nx-apollo/src/favicon.ico",
-              "apps/nx-apollo/src/assets"
+              "apps/nx-apollo-angular/src/favicon.ico",
+              "apps/nx-apollo-angular/src/assets"
             ],
-            "styles": ["apps/nx-apollo/src/styles.css"],
+            "styles": ["apps/nx-apollo-angular/src/styles.css"],
             "scripts": []
           },
           "configurations": {
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "apps/nx-apollo/src/environments/environment.ts",
-                  "with": "apps/nx-apollo/src/environments/environment.prod.ts"
+                  "replace": "apps/nx-apollo-angular/src/environments/environment.ts",
+                  "with": "apps/nx-apollo-angular/src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -59,37 +59,37 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "nx-apollo:build",
-            "proxyConfig": "apps/nx-apollo/proxy.conf.json"
+            "browserTarget": "nx-apollo-angular:build",
+            "proxyConfig": "apps/nx-apollo-angular/proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "browserTarget": "nx-apollo:build:production"
+              "browserTarget": "nx-apollo-angular:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "nx-apollo:build"
+            "browserTarget": "nx-apollo-angular:build"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "apps/nx-apollo/tsconfig.app.json",
-              "apps/nx-apollo/tsconfig.spec.json"
+              "apps/nx-apollo-angular/tsconfig.app.json",
+              "apps/nx-apollo-angular/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/nx-apollo/**"]
+            "exclude": ["**/node_modules/**", "!apps/nx-apollo-angular/**"]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {
-            "jestConfig": "apps/nx-apollo/jest.config.js",
-            "tsConfig": "apps/nx-apollo/tsconfig.spec.json",
-            "setupFile": "apps/nx-apollo/src/test-setup.ts"
+            "jestConfig": "apps/nx-apollo-angular/jest.config.js",
+            "tsConfig": "apps/nx-apollo-angular/tsconfig.spec.json",
+            "setupFile": "apps/nx-apollo-angular/src/test-setup.ts"
           }
         },
         "generate": {
@@ -97,36 +97,36 @@
           "options": {
             "commands": [
               {
-                "command": "npx graphql-codegen --config apps/nx-apollo/codegen.yml"
+                "command": "npx graphql-codegen --config apps/nx-apollo-angular/codegen.yml"
               }
             ]
           }
         }
       }
     },
-    "nx-apollo-e2e": {
-      "root": "apps/nx-apollo-e2e",
-      "sourceRoot": "apps/nx-apollo-e2e/src",
+    "nx-apollo-angular-e2e": {
+      "root": "apps/nx-apollo-angular-e2e",
+      "sourceRoot": "apps/nx-apollo-angular-e2e/src",
       "projectType": "application",
       "architect": {
         "e2e": {
           "builder": "@nrwl/cypress:cypress",
           "options": {
-            "cypressConfig": "apps/nx-apollo-e2e/cypress.json",
-            "tsConfig": "apps/nx-apollo-e2e/tsconfig.e2e.json",
-            "devServerTarget": "nx-apollo:serve"
+            "cypressConfig": "apps/nx-apollo-angular-e2e/cypress.json",
+            "tsConfig": "apps/nx-apollo-angular-e2e/tsconfig.e2e.json",
+            "devServerTarget": "nx-apollo-angular:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "nx-apollo:serve:production"
+              "devServerTarget": "nx-apollo-angular:serve:production"
             }
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["apps/nx-apollo-e2e/tsconfig.e2e.json"],
-            "exclude": ["**/node_modules/**", "!apps/nx-apollo-e2e/**"]
+            "tsConfig": ["apps/nx-apollo-angular-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/nx-apollo-angular-e2e/**"]
           }
         }
       }
@@ -351,5 +351,5 @@
       }
     }
   },
-  "defaultProject": "nx-apollo"
+  "defaultProject": "nx-apollo-angular"
 }

@@ -11,12 +11,12 @@
     "nx.json": "*"
   },
   "projects": {
-    "nx-apollo": {
+    "nx-apollo-angular": {
       "tags": []
     },
-    "nx-apollo-e2e": {
+    "nx-apollo-angular-e2e": {
       "tags": [],
-      "implicitDependencies": ["nx-apollo"]
+      "implicitDependencies": ["nx-apollo-angular"]
     },
     "api": {
       "tags": []

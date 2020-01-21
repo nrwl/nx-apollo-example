@@ -11,7 +11,7 @@ GraphQL API
 - `npm start api`
 
 [Angular](https://angular.io)
-- `npm start nx-apollo`
+- `npm start nx-apollo-angular`
 
 [React](https://reactjs.org)
 - `npm start nx-apollo-react`
@@ -36,7 +36,7 @@ Let’s get started by creating our Nx workspace. We’ll start with an empty wo
 philip@DESKTOP-L1839TI:~$ npx create-nx-workspace@latest nx-apollo-example
 npx: installed 169 in 42.333s
 ? What to create in the new workspace angular-nest      [a workspace with a full stack application (Angular + Nest)]
-? Application name                    nx-apollo       
+? Application name                    nx-apollo-example       
 ? Default stylesheet format           CSS`
 ```
 
@@ -195,29 +195,32 @@ Just like with Nest, we need to add Angular support to our workspace and create 
 
 `nx add @nrwl/angular`
 
-`nx generate @nrwl/angular:application nx-apollo`
+`nx generate @nrwl/angular:application nx-apollo-angular`
 
-We’ll be using the Apollo client to consume our GraphQL API, so let’s install that. The Apollo team has made it easy for us by supporting the Angular CLI’s add command:
+We’ll be using the Apollo client to consume our GraphQL API, so let’s install that. The Apollo team has made it easy for us by supporting the Angular CLI’s add command, which we can invoke using the Nx CLI:
+
+`nx g apollo-angular:ng-add apoll-angular`
+
+If your project is using the Angular CLI, you can use it directly:
 
 `ng add apollo-angular`
 
 When that’s done running, you’ll have a new file in your Angular application named graph.module.ts. Open it up and add the URI of your GraphQL api at the top of this file
 
 ```typescript
-// apps/nx-apollo/src/app/graphql.module.ts
+// apps/nx-apollo-angular/src/app/graphql.module.ts
 const uri = 'http://localhost:3333/graphql'; // <-- add the URL of the GraphQL server here
 ```
 
 ## Setup Angular Code Generation
 We’ll take advantage of a tool called GraphQL Code Generator to make development a little faster. As always, first we install dependencies:
 
-npm install --save-dev @graphql-codegen/cli @graphql-codegen/typescript-operations
-@graphql-codegen/typescript-apollo-angular
+`npm install --save-dev @graphql-codegen/cli @graphql-codegen/typescript-operations @graphql-codegen/typescript-apollo-angular`
 
 We’ll need to create some queries and mutations for the frontend to consume GraphQL. Create a folder named graphql in your Angular application with a file inside called operations.graphql:
 
 ```
-// apps/nx-apollo/src/app/graphql/operations.graphql
+// apps/nx-apollo-angular/src/app/graphql/operations.graphql
 
 query setList {
   allSets{
@@ -242,12 +245,12 @@ mutation addSet($name: String!, $year: String!, $numParts: Int!) {
 To configure the code generator for Angular, we’ll create a file named codegen.yml in our Angular project:
 
 ```yaml
-# apps/nx-apollo/codegen.yml
+# apps/nx-apollo-angular/codegen.yml
 overwrite: true
 schema: "apps/api/src/app/schema.graphql"
 generates:
-  apps/nx-apollo/src/app/generated/generated.ts:
-    documents: "apps/nx-apollo/**/*.graphql"
+  apps/nx-apollo-angular/src/app/generated/generated.ts:
+    documents: "apps/nx-apollo-angular/**/*.graphql"
     plugins:
       - "typescript"
       - "typescript-operations"
@@ -263,7 +266,7 @@ To actually run this code generator, we’ll add a new task to our Angular proje
 {
   "version": 1,
   "projects": {
-    "nx-apollo": {
+    "nx-apollo-angular": {
       ...
       "architect": {
         ...
@@ -272,7 +275,7 @@ To actually run this code generator, we’ll add a new task to our Angular proje
           "options": {
             "commands": [
               {
-                "command": "npx graphql-codegen --config apps/nx-apollo/codegen.yml"
+                "command": "npx graphql-codegen --config apps/nx-apollo-angular/codegen.yml"
               }
             ]
           }
@@ -285,21 +288,21 @@ To actually run this code generator, we’ll add a new task to our Angular proje
 
 Now we can run that using the Nx CLI:
 
-`nx run nx-apollo:generate`
+`nx run nx-apollo-angular:generate`
 
 We should now have a folder called generated in our Angular project with a file named generated.ts. It contains typing information about the GraphQL schema and the operations we defined. It even has some services which will make consuming this api super-fast.
 
 ## Create Angular components
 We now have all we need to start building our Angular components. We’ll create two: a list of Lego sets and a form to add a Lego set. We use the Nx CLI to build these:
 
-`nx generate @schematics/angular:component --name=SetList --project=nx-apollo --module=app.module.ts `
+`nx generate @schematics/angular:component --name=SetList --project=nx-apollo-angular --module=app.module.ts `
 
-`nx generate @schematics/angular:component --name=SetForm --project=nx-apollo --module=app.module.ts`
+`nx generate @schematics/angular:component --name=SetForm --project=nx-apollo-angular --module=app.module.ts`
 
 Since our form is using the ReactiveFormsModule, remember to import that into your app module. Your app.module.ts file should look like this now.
 
 ```typescript
-// apps/nx-apollo/src/app/app.module.ts
+// apps/nx-apollo-angular/src/app/app.module.ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
@@ -321,7 +324,7 @@ export class AppModule {}
 
 In the SetList component, add the following:
 ```html
-<!-- apps/nx-apollo/src/app/set-list/set-list.component.html -->
+<!-- apps/nx-apollo-angular/src/app/set-list/set-list.component.html -->
 <ul>
   <li *ngFor="let set of sets$ | async">
     {{ set.year }} <strong>{{ set.name }}</strong> ({{ set.numParts }} parts)
@@ -330,7 +333,7 @@ In the SetList component, add the following:
 ```
 
 ```css
-/* apps/nx-apollo/src/app/set-list/set-list.component.css */
+/* apps/nx-apollo-angular/src/app/set-list/set-list.component.css */
 
 :host {
   font-family: sans-serif;
@@ -356,7 +359,7 @@ span.year {
 ```
 
 ```typescript
-// apps/nx-apollo/src/app/set-list/set-list.component.ts
+// apps/nx-apollo-angular/src/app/set-list/set-list.component.ts
 import { Component } from '@angular/core';
 import { Set } from '@nx-apollo-example/api-interfaces';
 import { Observable } from 'rxjs';
@@ -384,7 +387,7 @@ Notice how we’ve imported SetListGQL. This is a service generated by GraphQL C
 Final step: bring those new components into our app component and add a little styling
 
 ```html
-<!-- apps/nx-apollo/src/app/app.component.html -->
+<!-- apps/nx-apollo-angular/src/app/app.component.html -->
 <h1>My Lego Sets</h1>
 <div class="flex">
   <nx-apollo-example-set-form></nx-apollo-example-set-form>
@@ -393,7 +396,7 @@ Final step: bring those new components into our app component and add a little s
 ```
 
 ```css
-/* apps/nx-apollo/src/app/app.component.css */
+/* apps/nx-apollo-angular/src/app/app.component.css */
 h1 {
   font-family: sans-serif;
   text-align: center;
@@ -415,7 +418,7 @@ If your API isn’t running already, go ahead and start it:
 
 And now start your Angular app
 
-`npm start nx-apollo`
+`npm start nx-apollo-angular`
 
 Browse to [http://localhost:4200](http://localhost:4200) and see the results of our work!
 
@@ -539,7 +542,7 @@ We now have all we need to start building our React components. We’ll create t
 
 `nx generate @schematics/react:component --name=SetList --project=nx-apollo-react`
 
-`nx generate @schematics/react:component --name=SetForm --project=nx-apollo`
+`nx generate @schematics/react:component --name=SetForm --project=nx-apollo-react`
 
 In the SetList component, add the following:
 
