@@ -189,38 +189,32 @@ mutation {
 ```
 
 Now that our API is working, we’re ready to build a frontend to access this.
+## Add Angular support
 
-## Create Angular app
-Just like with Nest, we need to add Angular support to our workspace and create an application:
+We'll start with our Angular app. The angular app and libraries will be separate from our React app, this section can be skipped if you're only interested in React support. 
+
+Just like with Angular, we need to add Angular support to our workspace and create an application:
 
 `nx add @nrwl/angular`
 
-`nx generate @nrwl/angular:application nx-apollo-angular`
+## Create Angular libraries
+Nx alllows us to break down our code into well-organized libraries for consumption by apps, so let's create a couple of Angular libraries to organize our work. We'll create a data-access library which will handle communication with the backend, and a feature-sets library which will include our container components for displaying the Lego set data. Ina  real app, we might also create a ui library which would include our reusable presentational components, but we'll leave that out in this example. We'll group both of these libraries into an angular directory in libs to keep them separate from the React libraries we'll create later. For more information on how to organize your Angular monorepo using Nx, read our book [Enterprise Angular Monorepo Patterns](https://go.nrwl.io/angular-enterprise-monorepo-patterns-new-book).
 
-We’ll be using the Apollo client to consume our GraphQL API, so let’s install that. The Apollo team has made it easy for us by supporting the Angular CLI’s add command, which we can invoke using the Nx CLI:
+To create the described libraries, we run these commands:
 
-`nx g apollo-angular:ng-add apoll-angular`
+`nx generate @nrwl/angular:library feature-sets --directory angular --style css`
 
-If your project is using the Angular CLI, you can use it directly:
-
-`ng add apollo-angular`
-
-When that’s done running, you’ll have a new file in your Angular application named graph.module.ts. Open it up and add the URI of your GraphQL api at the top of this file
-
-```typescript
-// apps/nx-apollo-angular/src/app/graphql.module.ts
-const uri = 'http://localhost:3333/graphql'; // <-- add the URL of the GraphQL server here
-```
+`nx generate @nrwl/angular:library data-access --directory angular --style css`
 
 ## Setup Angular Code Generation
-We’ll take advantage of a tool called GraphQL Code Generator to make development a little faster. As always, first we install dependencies:
+We’ll take advantage of a tool called GraphQL Code Generator to make development of our data-access library a little faster. As always, first we install dependencies:
 
 `npm install --save-dev @graphql-codegen/cli @graphql-codegen/typescript-operations @graphql-codegen/typescript-apollo-angular`
 
-We’ll need to create some queries and mutations for the frontend to consume GraphQL. Create a folder named graphql in your Angular application with a file inside called operations.graphql:
+We’ll need to create some queries and mutations for the frontend to consume GraphQL. Create a folder named graphql in your data-access library with a file inside called operations.graphql:
 
 ```
-// apps/nx-apollo-angular/src/app/graphql/operations.graphql
+// libs/angular/data-access/src/lib/graphql/operations/graphql
 
 query setList {
   allSets{
@@ -242,15 +236,15 @@ mutation addSet($name: String!, $year: String!, $numParts: Int!) {
 }
 ```
 
-To configure the code generator for Angular, we’ll create a file named codegen.yml in our Angular project:
+To configure the code generator for Angular, we’ll create a file named codegen.yml in our library:
 
 ```yaml
-# apps/nx-apollo-angular/codegen.yml
+# libs/angular/data-access/codegen.yml
 overwrite: true
 schema: "apps/api/src/app/schema.graphql"
 generates:
-  apps/nx-apollo-angular/src/app/generated/generated.ts:
-    documents: "apps/nx-apollo-angular/**/*.graphql"
+  libs/angular/data-access/src/lib/generated/generated.ts:
+    documents: "libs/angular/data-access/src/lib/graphql/**/*.graphql"
     plugins:
       - "typescript"
       - "typescript-operations"
@@ -266,7 +260,7 @@ To actually run this code generator, we’ll add a new task to our Angular proje
 {
   "version": 1,
   "projects": {
-    "nx-apollo-angular": {
+    "angular-data-access": {
       ...
       "architect": {
         ...
@@ -288,43 +282,51 @@ To actually run this code generator, we’ll add a new task to our Angular proje
 
 Now we can run that using the Nx CLI:
 
-`nx run nx-apollo-angular:generate`
+`nx run angular-data-access:generate`
 
-We should now have a folder called generated in our Angular project with a file named generated.ts. It contains typing information about the GraphQL schema and the operations we defined. It even has some services which will make consuming this api super-fast.
+We should now have a folder called generated in our data-access library with a file named generated.ts. It contains typing information about the GraphQL schema and the operations we defined. It even has some services which will make consuming this api super-fast.
+
+To make these available to consumers, we'll export them in the index.ts of our data-access library:
+
+```typescript
+// libs/angular/data-access/src/index.ts
+
+export * from './lib/angular-data-access.module';
+export * from './lib/generated/generated';
+```
 
 ## Create Angular components
 We now have all we need to start building our Angular components. We’ll create two: a list of Lego sets and a form to add a Lego set. We use the Nx CLI to build these:
 
-`nx generate @schematics/angular:component --name=SetList --project=nx-apollo-angular --module=app.module.ts `
+`nx generate @schematics/angular:component --name=SetList --project=angular-feature-sets`
 
-`nx generate @schematics/angular:component --name=SetForm --project=nx-apollo-angular --module=app.module.ts`
+`nx generate @schematics/angular:component --name=SetForm --project=angular-feature-sets`
 
-Since our form is using the ReactiveFormsModule, remember to import that into your app module. Your app.module.ts file should look like this now.
+Since our form will be using the ReactiveFormsModule, remember to import that into your module. We'll also want to export these components for others to consume. Your angular-feature-sets.module.ts file should look like this now.
 
 ```typescript
-// apps/nx-apollo-angular/src/app/app.module.ts
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+// libs/angular/feature-sets/src/lib/angular-feature-sets.module.ts
 
-import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
-import { GraphQLModule } from './graphql.module';
-import { SetListComponent } from './set-list/set-list.component';
-import { SetFormComponent } from './set-form/set-form.component';
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SetFormComponent } from './set-form/set-form.component';
+import { SetListComponent } from './set-list/set-list.component';
 
 @NgModule({
-  declarations: [AppComponent, SetListComponent, SetFormComponent],
-  imports: [BrowserModule, HttpClientModule, GraphQLModule, ReactiveFormsModule],
-  providers: [],
-  bootstrap: [AppComponent]
+  imports: [CommonModule, ReactiveFormsModule],
+  declarations: [SetListComponent, SetFormComponent],
+  exports: [SetListComponent, SetFormComponent]
 })
-export class AppModule {}
+export class AngularFeatureSetsModule {}
+
 ```
 
 In the SetList component, add the following:
+
 ```html
-<!-- apps/nx-apollo-angular/src/app/set-list/set-list.component.html -->
+<!-- libs/angular/feature-sets/src/lib/set-list/set-list.component.html -->
+
 <ul>
   <li *ngFor="let set of sets$ | async">
     {{ set.year }} <strong>{{ set.name }}</strong> ({{ set.numParts }} parts)
@@ -333,7 +335,7 @@ In the SetList component, add the following:
 ```
 
 ```css
-/* apps/nx-apollo-angular/src/app/set-list/set-list.component.css */
+/* libs/angular/feature-sets/src/lib/set-list/set-list.component.css */
 
 :host {
   font-family: sans-serif;
@@ -359,12 +361,13 @@ span.year {
 ```
 
 ```typescript
-// apps/nx-apollo-angular/src/app/set-list/set-list.component.ts
+// libs/angular/feature-sets/src/lib/set-list/set-list.component.ts
+
 import { Component } from '@angular/core';
 import { Set } from '@nx-apollo-example/api-interfaces';
 import { Observable } from 'rxjs';
+import { SetListGQL } from '@nx-apollo-example/angular/data-access';
 import { map } from 'rxjs/operators';
-import { SetListGQL } from '../generated/generated';
 
 @Component({
   selector: 'nx-apollo-example-set-list',
@@ -375,16 +378,139 @@ export class SetListComponent {
   sets$: Observable<Set[]>;
 
   constructor(private setListGQL: SetListGQL) {
-    this.sets$ = this.setListGQL
-      .watch()
-      .valueChanges.pipe(map(result => result.data.allSets));
+    this.sets$ = this.setListGQL.watch().valueChanges.pipe(map((result) => result.data.allSets));
   }
 }
 ```
 
-Notice how we’ve imported SetListGQL. This is a service generated by GraphQL Code Generator that will allow us to use the results of the SetList query we created earlier. We watch the results of this query and map them so that we get the list of sets. This entire pipeline is type-safe, using the types generated for us.
+Notice how we’ve imported SetListGQL from the data-access library. This is a service generated by GraphQL Code Generator that will allow us to use the results of the SetList query we created earlier. We watch the results of this query and map them so that we get the list of sets. This entire pipeline is type-safe, using the types generated for us.
 
-Final step: bring those new components into our app component and add a little styling
+In the SetForm component, add the following:
+
+```html
+<!-- libs/angular/feature-sets/src/lib/set-form/set-form.component.html -->
+
+<form [formGroup]="newSetForm" (submit)="createSet()">
+  <label for="name">Name</label><br />
+  <input formControlName="name" /><br />
+
+  <label for="year">Year of Release</label><br />
+  <input formControlName="year" /><br />
+
+  <label for="numParts">Number of Parts</label><br />
+  <input formControlName="numParts" /><br />
+
+  <button>Create new set</button>
+</form>
+```
+
+```css
+/* libs/angular/feature-sets/src/lib/set-form/set-form.component.css */
+
+form {
+    font-family: sans-serif;
+    border: solid 1px #eee;
+    max-width: 240px;
+    padding: 24px;
+}
+
+input {
+    display: block;
+    margin-bottom: 8px;
+}
+```
+
+```typescript
+// libs/angular/feature-sets/src/lib/set-form/set-form.component.ts
+
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AddSetGQL, SetListDocument, SetListQuery } from '@nx-apollo-example/angular/data-access';
+@Component({
+  selector: 'nx-apollo-example-set-form',
+  templateUrl: './set-form.component.html',
+  styleUrls: ['./set-form.component.css']
+})
+export class SetFormComponent {
+  newSetForm: FormGroup;
+
+  constructor(private addSetGQL: AddSetGQL, private fb: FormBuilder) {
+
+    this.newSetForm = this.fb.group(
+      {
+        name: ['', Validators.required],
+        year: ['', Validators.required],
+        numParts: [100, Validators.required]
+      }
+    )
+  }
+
+  createSet() {
+    if (this.newSetForm.valid) {
+      const newSet = { name: this.newSetForm.get('name').value, year: this.newSetForm.get('year').value, numParts: +this.newSetForm.get('numParts').value };
+
+      this.addSetGQL.mutate(newSet)
+
+      this.addSetGQL.mutate(newSet, {
+        update: (store, result) => {
+          const data: SetListQuery = store.readQuery({ query: SetListDocument });
+          data.allSets = [...data.allSets, result.data.addSet];
+          // Write our data back to the cache.
+          store.writeQuery({ query: SetListDocument, data });
+        }
+      }).subscribe(() => {
+        this.newSetForm.reset();
+      });
+    }
+
+  }
+}
+
+```
+
+Again, notice that we've imported services, queries, and typing information from our data-access library to accomplish this.
+
+
+## Create Angular app
+
+Alright, we'd laid all of our groundwork, let's spin up an Angular application.
+
+`nx generate @nrwl/angular:application nx-apollo-angular`
+
+We’ll be using the Apollo client to consume our GraphQL API, so let’s install that. The Apollo team has made it easy for us by supporting the Angular CLI’s add command, which we can invoke using the Nx CLI:
+
+`nx g apollo-angular:ng-add apollo-angular`
+
+If your project is using the Angular CLI, you can use it directly:
+
+`ng add apollo-angular`
+
+When that’s done running, you’ll have a new file in your Angular application named graph.module.ts. Open it up and add the URI of your GraphQL api at the top of this file.
+
+```typescript
+// apps/nx-apollo-angular/src/app/graphql.module.ts
+const uri = 'http://localhost:3333/graphql'; // <-- add the URL of the GraphQL server here
+```
+Final step: import our modules, bring those new components into our app component, and add a little styling
+```typescript
+<!-- apps/nx-apollo-angular/src/app/app.module.ts -->
+
+import { HttpClientModule } from '@angular/common/http';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AngularFeatureSetsModule } from '@nx-apollo-example/angular/feature-sets';
+import { AppComponent } from './app.component';
+import { GraphQLModule } from './graphql.module';
+
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule, HttpClientModule, GraphQLModule, AngularFeatureSetsModule],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+```
 
 ```html
 <!-- apps/nx-apollo-angular/src/app/app.component.html -->

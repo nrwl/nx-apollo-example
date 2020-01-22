@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AddSetGQL, SetListDocument, SetListQuery } from '../generated/generated';
+import { AddSetGQL, SetListDocument, SetListQuery } from '@nx-apollo-example/angular/data-access';
 @Component({
   selector: 'nx-apollo-example-set-form',
   templateUrl: './set-form.component.html',

@@ -91,16 +91,6 @@
             "tsConfig": "apps/nx-apollo-angular/tsconfig.spec.json",
             "setupFile": "apps/nx-apollo-angular/src/test-setup.ts"
           }
-        },
-        "generate": {
-          "builder": "@nrwl/workspace:run-commands",
-          "options": {
-            "commands": [
-              {
-                "command": "npx graphql-codegen --config apps/nx-apollo-angular/codegen.yml"
-              }
-            ]
-          }
         }
       }
     },
@@ -323,6 +313,70 @@
           }
         }
       }
+    },
+    "angular-data-access": {
+      "projectType": "library",
+      "root": "libs/angular/data-access",
+      "sourceRoot": "libs/angular/data-access/src",
+      "prefix": "nx-apollo-example",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/angular/data-access/tsconfig.lib.json",
+              "libs/angular/data-access/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/angular/data-access/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/angular/data-access/jest.config.js",
+            "tsConfig": "libs/angular/data-access/tsconfig.spec.json",
+            "setupFile": "libs/angular/data-access/src/test-setup.ts"
+          }
+        },
+        "generate": {
+          "builder": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              {
+                "command": "npx graphql-codegen --config libs/angular/data-access/codegen.yml"
+              }
+            ]
+          }
+        }
+      },
+      "schematics": {}
+    },
+    "angular-feature-sets": {
+      "projectType": "library",
+      "root": "libs/angular/feature-sets",
+      "sourceRoot": "libs/angular/feature-sets/src",
+      "prefix": "nx-apollo-example",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/angular/feature-sets/tsconfig.lib.json",
+              "libs/angular/feature-sets/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/angular/feature-sets/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/angular/feature-sets/jest.config.js",
+            "tsConfig": "libs/angular/feature-sets/tsconfig.spec.json",
+            "setupFile": "libs/angular/feature-sets/src/test-setup.ts"
+          }
+        }
+      },
+      "schematics": {}
     }
   },
   "cli": {

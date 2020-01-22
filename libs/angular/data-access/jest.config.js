@@ -1,7 +1,7 @@
 module.exports = {
-  name: 'nx-apollo-angular',
-  preset: '../../jest.config.js',
-  coverageDirectory: '../../coverage/apps/nx-apollo-angular',
+  name: 'angular-data-access',
+  preset: '../../../jest.config.js',
+  coverageDirectory: '../../../coverage/libs/angular/data-access',
   snapshotSerializers: [
     'jest-preset-angular/AngularSnapshotSerializer.js',
     'jest-preset-angular/HTMLCommentSerializer.js'

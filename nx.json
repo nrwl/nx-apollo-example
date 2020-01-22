@@ -30,6 +30,12 @@
     "nx-apollo-react-e2e": {
       "tags": [],
       "implicitDependencies": ["nx-apollo-react"]
+    },
+    "angular-data-access": {
+      "tags": []
+    },
+    "angular-feature-sets": {
+      "tags": []
     }
   }
 }

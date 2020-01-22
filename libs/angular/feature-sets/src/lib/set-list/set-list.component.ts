@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Set } from '@nx-apollo-example/api-interfaces';
 import { Observable } from 'rxjs';
-import { SetListGQL } from '../generated/generated';
+import { SetListGQL } from '@nx-apollo-example/angular/data-access';
 import { map } from 'rxjs/operators';
 
 @Component({

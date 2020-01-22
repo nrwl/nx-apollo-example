@@ -1,8 +1,8 @@
 overwrite: true
 schema: "apps/api/src/app/schema.graphql"
 generates:
-  apps/nx-apollo/src/app/generated/generated.ts:
-    documents: "apps/nx-apollo/**/*.graphql"
+  libs/angular/data-access/src/lib/generated/generated.ts:
+    documents: "libs/angular/data-access/src/lib/graphql/**/*.graphql"
     plugins:
       - "typescript"
       - "typescript-operations"
