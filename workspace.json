@@ -274,16 +274,6 @@
             "jestConfig": "apps/nx-apollo-react/jest.config.js",
             "tsConfig": "apps/nx-apollo-react/tsconfig.spec.json"
           }
-        },
-        "generate": {
-          "builder": "@nrwl/workspace:run-commands",
-          "options": {
-            "commands": [
-              {
-                "command": "npx graphql-codegen --config apps/nx-apollo-react/codegen.yml"
-              }
-            ]
-          }
         }
       }
     },
@@ -377,6 +367,66 @@
         }
       },
       "schematics": {}
+    },
+    "react-feature-sets": {
+      "root": "libs/react/feature-sets",
+      "sourceRoot": "libs/react/feature-sets/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/react/feature-sets/tsconfig.lib.json",
+              "libs/react/feature-sets/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/react/feature-sets/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/react/feature-sets/jest.config.js",
+            "tsConfig": "libs/react/feature-sets/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "react-data-access": {
+      "root": "libs/react/data-access",
+      "sourceRoot": "libs/react/data-access/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/react/data-access/tsconfig.lib.json",
+              "libs/react/data-access/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/react/data-access/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/react/data-access/jest.config.js",
+            "tsConfig": "libs/react/data-access/tsconfig.spec.json"
+          }
+        },
+        "generate": {
+          "builder": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              {
+                "command": "npx graphql-codegen --config libs/react/data-access/codegen.yml"
+              }
+            ]
+          }
+        }
+      }
     }
   },
   "cli": {

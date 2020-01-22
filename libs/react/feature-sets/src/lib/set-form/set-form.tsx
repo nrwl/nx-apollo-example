@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
-import './add-set-form.css';
-import { useAddSetMutation, SetListDocument} from '../generated/generated';
+import './set-form.css';
+import { useAddSetMutation, SetListDocument} from '@nx-apollo-example/react/data-access';
 
 /* eslint-disable-next-line */
-export interface AddSetFormProps {}
+export interface SetFormProps {}
 
-export const AddSetForm = (props: AddSetFormProps) => {
+export const SetForm = (props: SetFormProps) => {
   const [name, setName] = useState('');
   const [year, setYear] = useState('');
   const [numParts, setNumParts] = useState(1000);
@@ -64,4 +64,4 @@ export const AddSetForm = (props: AddSetFormProps) => {
   );
 };
 
-export default AddSetForm;
+export default SetForm;

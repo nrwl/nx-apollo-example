@@ -22,6 +22,12 @@
       ],
       "@nx-apollo-example/angular/feature-sets": [
         "libs/angular/feature-sets/src/index.ts"
+      ],
+      "@nx-apollo-example/react/feature-sets": [
+        "libs/react/feature-sets/src/index.ts"
+      ],
+      "@nx-apollo-example/react/data-access": [
+        "libs/react/data-access/src/index.ts"
       ]
     }
   },

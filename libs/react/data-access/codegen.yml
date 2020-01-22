@@ -1,8 +1,8 @@
 overwrite: true
 schema: "apps/api/src/app/schema.graphql"
 generates:
-  apps/nx-apollo-react/src/app/generated/generated.tsx:
-    documents: "apps/nx-apollo-react/**/*.graphql"
+  libs/react/data-access/src/lib/generated/generated.tsx:
+    documents: "libs/react/data-access/src/lib/**/*.graphql"
     plugins:
       - "typescript"
       - "typescript-operations"

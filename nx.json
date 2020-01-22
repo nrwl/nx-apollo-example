@@ -36,6 +36,12 @@
     },
     "angular-feature-sets": {
       "tags": []
+    },
+    "react-feature-sets": {
+      "tags": []
+    },
+    "react-data-access": {
+      "tags": []
     }
   }
 }

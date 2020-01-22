@@ -1,11 +1,11 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import AddSetForm from './add-set-form';
+import SetForm from './set-form';
 
-describe(' AddSetForm', () => {
+describe(' SetForm', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<AddSetForm />);
+    const { baseElement } = render(<SetForm />);
     expect(baseElement).toBeTruthy();
   });
 });

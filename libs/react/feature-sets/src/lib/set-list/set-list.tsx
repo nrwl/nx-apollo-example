@@ -1,17 +1,7 @@
 import React from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
-const ALL_SETS = gql`
-  {
-    allSets {
-      name
-      pieces
-    }
-  }
-`;
 import './set-list.css';
-import { useSetListQuery } from '../generated/generated';
+import { useSetListQuery } from '@nx-apollo-example/react/data-access';
 
 /* eslint-disable-next-line */
 export interface SetListProps {}
