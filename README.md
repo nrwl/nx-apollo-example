@@ -28,22 +28,14 @@ In this article, you’ll learn how to:
 - Create a React application to consume your GraphQL api
 - Create a new workspace
 
-Let’s get started by creating our Nx workspace. We’ll start with an empty workspace:
+Let’s get started by creating our Nx workspace. We’ll start with an empty workspace that uses the Nx CLI:
 
-`npx create-nx-workspace@latest nx-apollo-example`
-
-```
-philip@DESKTOP-L1839TI:~$ npx create-nx-workspace@latest nx-apollo-example
-npx: installed 169 in 42.333s
-? What to create in the new workspace angular-nest      [a workspace with a full stack application (Angular + Nest)]
-? Application name                    nx-apollo-example       
-? Default stylesheet format           CSS`
-```
+`npx create-nx-workspace --preset=empty --cli nx nx-apollo-example`
 
 ## Create GraphQL API
 We’ll be using the NestJS framework to create our GraphQL API. First, let’s add NestJS to our Nx workspace and create an application:
 
-`nx add @nrwl/nestjs`
+`npm install --save-dev @nrwl/nest`
 
 `nx generate @nrwl/nest:application api`
 
@@ -51,9 +43,11 @@ Once our application is created, we’ll install the GraphQL modules needed for 
 
 `npm install @nestjs/graphql apollo-server-express graphql-tools graphql`
 
-We’re going to need a GraphQL schema to create our API, so let’s create a very simple one with a single query and a single mutation.
+We’re going to need a GraphQL schema to create our API, so let’s create a very simple one with a single query and a single mutation. Create a file named 'schema.graphql in the api application:
 
 ```
+// apps/api/src/app/schema.graphql
+
 type Set {
     id: Int!
     name: String
@@ -71,14 +65,15 @@ type Mutation {
 ```
 
 Now we can import the GraphQLModule and use that schema in NestJS.
+
 ```typescript
 // apps/api/src/app/app.module.ts
+
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SetResolver } from './set.resolver';
 
 @Module({
   imports: [
@@ -98,7 +93,7 @@ This is already enough to see some progress when we run our API application.
 
 When the application is running, you can bring up the GraphQL playground in your browser at [http://localhost:3333/graphql](http://localhost:3333/graphql)
 
-Here you can inspect your GraphQL schema as well as submit queries. The queries won’t return anything right now because we haven’t provided any data. Let’s take care of that by writing a resolver. Create a new file in your api project salled set.resolver.ts. Then add this code:
+Here you can inspect your GraphQL schema as well as submit queries. The queries won’t return anything right now because we haven’t provided any data. Let’s take care of that by writing a resolver. Create a new file in your api project named set.resolver.ts. Then add this code:
 
 ```typescript
 // apps/api/src/app/set.resolver.ts
@@ -158,6 +153,13 @@ This is a very simple resolver which will hold our data in memory. It will retur
 
 ```typescript
 // apps/api/src/app/app.module.ts
+
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { SetResolver } from './set.resolver';
+
 @Module({
   imports: [
     GraphQLModule.forRoot({
@@ -173,15 +175,15 @@ export class AppModule {}
 Go back to your GraphQL Playground and see if your queries return any data now. Try a query and a mutation:
 
 ```
-query {
+query allSets {
   allSets{
-    Id,
+    id,
     name,
     numParts
   }
 }
 
-mutation {
+mutation addSet {
   addSet(name: "My New Set", numParts: 200, year: "2020") {
     id
  }
@@ -196,10 +198,10 @@ We'll start with our Angular app. The angular app and libraries will be separate
 
 Just like with Angular, we need to add Angular support to our workspace and create an application:
 
-`nx add @nrwl/angular`
+`npm install --save-dev @nrwl/angular`
 
 ## Create Angular libraries
-Nx alllows us to break down our code into well-organized libraries for consumption by apps, so let's create a couple of Angular libraries to organize our work. We'll create a data-access library which will handle communication with the backend, and a feature-sets library which will include our container components for displaying the Lego set data. Ina  real app, we might also create a ui library which would include our reusable presentational components, but we'll leave that out in this example. We'll group both of these libraries into an angular directory in libs to keep them separate from the React libraries we'll create later. For more information on how to organize your Angular monorepo using Nx, read our book *Enterprise Angular Monorepo Pattern* by registerting at [Nrwl Connect](https://connect.nrwl.io/).
+Nx alllows us to break down our code into well-organized libraries for consumption by apps, so let's create a couple of Angular libraries to organize our work. We'll create a data-access library which will handle communication with the backend, and a feature-sets library which will include our container components for displaying the Lego set data. Ina  real app, we might also create a ui library which would include our reusable presentational components, but we'll leave that out in this example. We'll group both of these libraries into an angular directory in libs to keep them separate from the React libraries we'll create later. For more information on how to organize your Angular monorepo using Nx, read our book *Enterprise Angular Monorepo Pattern* by registering at [Nrwl Connect](https://connect.nrwl.io/).
 
 To create the described libraries, we run these commands:
 
@@ -215,7 +217,7 @@ We’ll take advantage of a tool called GraphQL Code Generator to make developme
 We’ll need to create some queries and mutations for the frontend to consume GraphQL. Create a folder named graphql in your data-access library with a file inside called operations.graphql:
 
 ```
-# libs/angular/data-access/src/lib/graphql/operations/graphql
+# libs/angular/data-access/src/lib/graphql/operations.graphql
 
 query setList {
   allSets{
@@ -270,7 +272,7 @@ To actually run this code generator, we’ll add a new task to our Angular proje
           "options": {
             "commands": [
               {
-                "command": "npx graphql-codegen --config apps/nx-apollo-angular/codegen.yml"
+                "command": "npx graphql-codegen --config libs/angular/data-access/codegen.yml"
               }
             ]
           }
@@ -299,11 +301,11 @@ export * from './lib/generated/generated';
 ## Create Angular components
 We now have all we need to start building our Angular components. We’ll create two: a list of Lego sets and a form to add a Lego set. We use the Nx CLI to build these:
 
-`nx generate @schematics/angular:component --name=SetList --project=angular-feature-sets`
+`nx generate @schematics/angular:component --name=SetList --project=angular-feature-sets --export`
 
-`nx generate @schematics/angular:component --name=SetForm --project=angular-feature-sets`
+`nx generate @schematics/angular:component --name=SetForm --project=angular-feature-sets --export`
 
-Since our form will be using the ReactiveFormsModule, remember to import that into your module. We'll also want to export these components for others to consume. Your angular-feature-sets.module.ts file should look like this now.
+Since our form will be using the ReactiveFormsModule, remember to import that into your module. Your angular-feature-sets.module.ts file should look like this now.
 
 ```typescript
 // libs/angular/feature-sets/src/lib/angular-feature-sets.module.ts
@@ -365,9 +367,8 @@ span.year {
 // libs/angular/feature-sets/src/lib/set-list/set-list.component.ts
 
 import { Component } from '@angular/core';
-import { Set } from '@nx-apollo-example/api-interfaces';
 import { Observable } from 'rxjs';
-import { SetListGQL } from '@nx-apollo-example/angular/data-access';
+import { Set, SetListGQL } from '@nx-apollo-example/angular/data-access';
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -466,7 +467,6 @@ export class SetFormComponent {
 
   }
 }
-
 ```
 
 Again, notice that we've imported services, queries, and typing information from our data-access library to accomplish this.
@@ -476,7 +476,7 @@ Again, notice that we've imported services, queries, and typing information from
 
 Alright, we'd laid all of our groundwork, let's spin up an Angular application.
 
-`nx generate @nrwl/angular:application nx-apollo-angular`
+`nx generate @nrwl/angular:application nx-apollo-angular --style css --routing false`
 
 We’ll be using the Apollo client to consume our GraphQL API, so let’s install that. The Apollo team has made it easy for us by supporting the Angular CLI’s add command, which we can invoke using the Nx CLI:
 
@@ -554,16 +554,16 @@ Browse to [http://localhost:4200](http://localhost:4200) and see the results of 
 
 Let's move on to our React app. Just like with Angular, we need to add React support to our workspace:
 
-`nx add @nrwl/react`
+`npm install --save-dev @nrwl/react`
 
 ## Create React libraries
 Nx alllows us to break down our code into well-organized libraries for consumption by apps, so let's create a couple of React libraries to organize our work. We'll create a data-access library which will handle communication with the backend, and a feature-sets library which will include our container components for displaying the Lego set data. In a real app, we might also create a ui library which would include our reusable presentational components, but we'll leave that out in this example. We'll group both of these libraries into an react directory in libs to keep them separate from the Angular libraries we created before. For more information on how to organize your React monorepo using Nx, read our book *Effective React Development with Nx* by registering at [Nrwl Connect](https://connect.nrwl.io/).
 
 To create the described libraries, we run these commands:
 
-`nx generate @nrwl/react:library feature-sets --directory react`
+`nx generate @nrwl/react:library feature-sets --directory react --style css`
 
-`nx generate @nrwl/react:library data-access --directory react`
+`nx generate @nrwl/react:library data-access --directory react --style css`
 
 ## Setup React Code Generation
 We’ll take advantage of a tool called GraphQL Code Generator to make things a little easier. As always, first we install dependencies:
@@ -598,7 +598,7 @@ mutation addSet($name: String!, $year: String!, $numParts: Int!) {
 To configure the code generator for React, we’ll create a file named codegen.yml in our React project:
 
 ```yaml
-# libs/react/data-access/codegen.yaml
+# libs/react/data-access/codegen.yml
 
 overwrite: true
 schema: "apps/api/src/app/schema.graphql"
@@ -632,7 +632,7 @@ To actually run this code generator, we’ll add a new task to our React project
           "options": {
             "commands": [
               {
-                "command": "npx graphql-codegen --config apps/nx-apollo-react/codegen.yml"
+                "command": "npx graphql-codegen --config libs/react/data-access/codegen.yml"
               }
             ]
           }
@@ -661,9 +661,9 @@ export * from './lib/generated/generated';
 ## Create React components
 We now have all we need to start building our React components. We’ll create two: a list of Lego sets and a form to add a Lego set. We use the Nx CLI to build these:
 
-`nx generate @nrwl/react:component --name=SetList --export --project=react-feature-sets`
+`nx generate @nrwl/react:component --name=SetList --export --project=react-feature-sets --style=css`
 
-`nx generate @nrwl/react:component --name=SetForm --export --project=react-feature-sets`
+`nx generate @nrwl/react:component --name=SetForm --export --project=react-feature-sets --style=css`
 
 In the SetList component, add the following:
 
@@ -696,11 +696,11 @@ export const SetList = (props: SetListProps) => {
 };
 
 export default SetList;
-
 ```
 
 ```css
 /* libs/react/feature-sets/src/lib/set-list/set-list.css */
+
 ul {
   list-style: none;
   margin: 0;
@@ -800,6 +800,7 @@ export default SetForm;
 
 ```css
 /* libs/react/feature-sets/src/lib/set-form/set-form.css */
+
 form {
     font-family: sans-serif;
     border: solid 1px #eee;
@@ -816,7 +817,7 @@ input {
 ## Create React App
 Let’s create the React application now.
 
-`nx generate @nrwl/react:application nx-apollo-react`
+`nx generate @nrwl/react:application nx-apollo-react --style=css --routing=false`
 
 We’ll be using the Apollo client to consume our GraphQL API, so let’s install that. 
 
