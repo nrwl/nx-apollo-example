@@ -26,7 +26,8 @@ In this article, you’ll learn how to:
 - Autogenerate frontend code based on your GraphQL schema
 - Create an Angular application to consume your GraphQL api
 - Create a React application to consume your GraphQL api
-- Create a new workspace
+
+## Create a new workspace
 
 Let’s get started by creating our Nx workspace. We’ll start with an empty workspace:
 
@@ -98,7 +99,7 @@ This is already enough to see some progress when we run our API application.
 
 When the application is running, you can bring up the GraphQL playground in your browser at [http://localhost:3333/graphql](http://localhost:3333/graphql)
 
-Here you can inspect your GraphQL schema as well as submit queries. The queries won’t return anything right now because we haven’t provided any data. Let’s take care of that by writing a resolver. Create a new file in your api project salled set.resolver.ts. Then add this code:
+Here you can inspect your GraphQL schema as well as submit queries. The queries won’t return anything right now because we haven’t provided any data. Let’s take care of that by writing a resolver. Create a new file in your api project called `set.resolver.ts`. Then add this code:
 
 ```typescript
 // apps/api/src/app/set.resolver.ts
@@ -199,7 +200,7 @@ Just like with Angular, we need to add Angular support to our workspace and crea
 `nx add @nrwl/angular`
 
 ## Create Angular libraries
-Nx alllows us to break down our code into well-organized libraries for consumption by apps, so let's create a couple of Angular libraries to organize our work. We'll create a data-access library which will handle communication with the backend, and a feature-sets library which will include our container components for displaying the Lego set data. Ina  real app, we might also create a ui library which would include our reusable presentational components, but we'll leave that out in this example. We'll group both of these libraries into an angular directory in libs to keep them separate from the React libraries we'll create later. For more information on how to organize your Angular monorepo using Nx, read our book *Enterprise Angular Monorepo Pattern* by registerting at [Nrwl Connect](https://connect.nrwl.io/).
+Nx alllows us to break down our code into well-organized libraries for consumption by apps, so let's create a couple of Angular libraries to organize our work. We'll create a data-access library which will handle communication with the backend, and a feature-sets library which will include our container components for displaying the Lego set data. Ina  real app, we might also create a ui library which would include our reusable presentational components, but we'll leave that out in this example. We'll group both of these libraries into an angular directory in libs to keep them separate from the React libraries we'll create later. For more information on how to organize your Angular monorepo using Nx, read our book *Enterprise Angular Monorepo Pattern* by registering at [Nrwl Connect](https://connect.nrwl.io/).
 
 To create the described libraries, we run these commands:
 
@@ -303,7 +304,7 @@ We now have all we need to start building our Angular components. We’ll create
 
 `nx generate @schematics/angular:component --name=SetForm --project=angular-feature-sets`
 
-Since our form will be using the ReactiveFormsModule, remember to import that into your module. We'll also want to export these components for others to consume. Your angular-feature-sets.module.ts file should look like this now.
+Since our form will be using the ReactiveFormsModule, remember to import that into your module. We'll also want to export these components for others to consume. Your `angular-feature-sets.module.ts` file should look like this now.
 
 ```typescript
 // libs/angular/feature-sets/src/lib/angular-feature-sets.module.ts
@@ -474,7 +475,7 @@ Again, notice that we've imported services, queries, and typing information from
 
 ## Create Angular app
 
-Alright, we'd laid all of our groundwork, let's spin up an Angular application.
+Alright, we've laid all of our groundwork, let's spin up an Angular application.
 
 `nx generate @nrwl/angular:application nx-apollo-angular`
 
@@ -557,7 +558,7 @@ Let's move on to our React app. Just like with Angular, we need to add React sup
 `nx add @nrwl/react`
 
 ## Create React libraries
-Nx alllows us to break down our code into well-organized libraries for consumption by apps, so let's create a couple of React libraries to organize our work. We'll create a data-access library which will handle communication with the backend, and a feature-sets library which will include our container components for displaying the Lego set data. In a real app, we might also create a ui library which would include our reusable presentational components, but we'll leave that out in this example. We'll group both of these libraries into an react directory in libs to keep them separate from the Angular libraries we created before. For more information on how to organize your React monorepo using Nx, read our book *Effective React Development with Nx* by registering at [Nrwl Connect](https://connect.nrwl.io/).
+Nx alllows us to break down our code into well-organized libraries for consumption by apps, so let's create a couple of React libraries to organize our work. We'll create a data-access library which will handle communication with the backend, and a feature-sets library which will include our container components for displaying the Lego set data. In a real app, we might also create a ui library which would include our reusable presentational components, but we'll leave that out in this example. We'll group both of these libraries into a react directory in libs to keep them separate from the Angular libraries we created before. For more information on how to organize your React monorepo using Nx, read our book *Effective React Development with Nx* by registering at [Nrwl Connect](https://connect.nrwl.io/).
 
 To create the described libraries, we run these commands:
 
